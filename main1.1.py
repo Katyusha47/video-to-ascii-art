@@ -103,30 +103,64 @@ def ascii_generator(image_frame, start_frame, number_of_frames):
             continue
         current_frame += 1
 
-        def preflight_operations(path):
-            if os.path.exists(path):
-                path_to_video = path.strip()
-                cap = cv2.VideoCapture(path_to_video)
-                total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-                cap.release()
+def preflight_operations(path):
+    if os.path.exists(path):
+        path_to_video = path.strip()
+        cap = cv2.VideoCapture(path_to_video)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        cap.release()
 
-                video = mp.VideoFileClip(path_to_video)
-                path_to_audio = r"Audio/" + "audio.mp3"
-                video.audio.write_audiofile(path_to_audio)
+        video = mp.VideoFileClip(path_to_video)
+        path_to_audio = r"Audio/" + "audio.mp3"
+        video.audio.write_audiofile(path_to_audio)
 
-                frame_per_process = int(total_frames // 4)
+        frame_per_process = int(total_frames // 4)
 
-                process1_end_frame = frame_per_process
-                process2_start_frame = process1_end_frame + 1
-                process2_end_frame = process2_start_frame + frame_per_process
-                process3_start_frame = process2_end_frame + 1
-                process3_end_frame = process3_start_frame + frame_per_process
-                process4_start_frame = process3_end_frame + 1
-                process4_end_frame = total_frames - 1
+        process1_end_frame = frame_per_process
+        process2_start_frame = process1_end_frame + 1
+        process2_end_frame = process2_start_frame + frame_per_process
+        process3_start_frame = process2_end_frame + 1
+        process3_end_frame = process3_start_frame + frame_per_process
+        process4_start_frame = process3_end_frame + 1
+        process4_end_frame = total_frames - 1
 
-                start_time = time.time()
-                sys.stdout.write('Generating frames...\n')
-                extract_transform_generate(path_to_video, 1, process4_end_frame)
+        start_time = time.time()
+        sys.stdout.write('Beginning ASCII generation...\n')
+        extract_transform_generate(path_to_video, 1, process4_end_frame)
+        execution_time = time.time() - start_time
+        sys.stdout.write('ASCII generation completed! ASCII generation time: ' + str(execution_time))
+
+        return total_frames
+
+    else:
+        sys.stdout.write('File not found!\n')
+        sys.exit()
+
+def main():
+    while True:
+        sys.stdout.write('==============================================================\n')
+        sys.stdout.write('Select option: \n')
+        sys.stdout.write('1) Play\n')
+        sys.stdout.write('2) Exit\n')
+        sys.stdout.write('==============================================================\n')
+
+        user_input = str(input("Your option: "))
+        user_input.strip()  # removes trailing whitespaces
+
+        if user_input == '1':
+            user_input = str(input("Enter the video file name: "))
+            total_frames = preflight_operations(user_input)
+            play_audio('audio.mp3')
+            play_video(total_frames=total_frames)
+        elif user_input == '2':
+            exit()
+            continue
+        else:
+            sys.stdout.write('Unknown input!\n')
+            continue
+
+if __name__ == '__main__':
+    main()
 
 
 
