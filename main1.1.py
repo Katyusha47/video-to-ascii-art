@@ -71,3 +71,67 @@ def progress_bar(current, total, bar_length=20):
     spaces = ' ' * (bar_length - len(arrow))
     sys.stdout.write("\rProgress: [%s%s] %d%% Frames %".format(arrow + spaces, int(progress)))
 
+def resize_image(image_frame):
+    width, height = image_frame.size
+    aspect_ratio = (height / float(width * 2.5))
+    new_height = int(aspect_ratio * frame_size)
+    resized_image = image_frame.resize((frame_size, new_height))
+    return resized_image
+
+def greyscale(image_frame):
+    return image_frame.convert("L")
+
+def pixels_to_ascii(image_frame):
+    pixels = image_frame.getdata()
+    characters = "".join([ASCII_CHARS[pixel // 25] for pixel in pixels])
+    return characters
+
+def ascii_generator(image_frame, start_frame, number_of_frames):
+    current_frame = start_frame
+    while current_frame <= number_of_frames:
+        path_to_image = image_frame + 'frame' + str(current_frame) + '.jpg'
+        image = Image.open(path_to_image)
+        ascii_characters = pixels_to_ascii(greyscale(resize_image(image)))  # get ascii characters
+        pixel_count = len(ascii_characters)
+        ascii_image = "\n".join(
+            [ascii_characters[index:(index + frame_size)] for index in range(0, pixel_count, frame_size)])
+        file_name = r"TextFiles/" + "frame" + str(current_frame) + ".txt"
+        try:
+            with open(file_name, "w")as f:
+                f.write(ascii_image)
+        except FileNotFoundError:
+            continue
+        current_frame += 1
+
+        def preflight_operations(path):
+            if os.path.exists(path):
+                path_to_video = path.strip()
+                cap = cv2.VideoCapture(path_to_video)
+                total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                cap.release()
+
+                video = mp.VideoFileClip(path_to_video)
+                path_to_audio = r"Audio/" + "audio.mp3"
+                video.audio.write_audiofile(path_to_audio)
+
+                frame_per_process = int(total_frames // 4)
+
+                process1_end_frame = frame_per_process
+                process2_start_frame = process1_end_frame + 1
+                process2_end_frame = process2_start_frame + frame_per_process
+                process3_start_frame = process2_end_frame + 1
+                process3_end_frame = process3_start_frame + frame_per_process
+                process4_start_frame = process3_end_frame + 1
+                process4_end_frame = total_frames - 1
+
+                start_time = time.time()
+                sys.stdout.write('Generating frames...\n')
+                extract_transform_generate(path_to_video, 1, process4_end_frame)
+
+
+
+
+
+
+
+
