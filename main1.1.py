@@ -111,7 +111,7 @@ def preflight_operations(path):
         cap.release()
 
         video = mp.VideoFileClip(path_to_video)
-        path_to_audio = r"Audio/" + "audio.mp3"
+        path_to_audio = 'audio.mp3'
         video.audio.write_audiofile(path_to_audio)
 
         frame_per_process = int(total_frames // 4)
