@@ -36,4 +36,4 @@ Input your choice: 1
 ```
 
 * And then, choose your audio preferrence
-* After that, the program will generate the video frame and convert it to ASCII. Just wait a second and then the video will start playing
+* After that, the program will generate the video frame and convert it to ASCII. Just wait until it done and then the video will start playing
